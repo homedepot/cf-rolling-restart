@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+# shellcheck disable=1091
+source script/settings
+
+# shellcheck disable=1091
+source script/common
+
+echo ""
+
+if ! builtin type -p cf &>/dev/null; then
+    echo "ERROR: cf cli not installed" >&2
+    exit 1
+fi
+
+gobuild
+
+cf uninstall-plugin RollingRestartPlugin > /dev/null || true
+
+echo "installing"
+cf install-plugin "./bin/$OUTPUT" -f
