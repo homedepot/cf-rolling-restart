@@ -1,24 +1,24 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"sort"
-	"flag"
-	"errors"
-	"strings"
 	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"time"
 
-	"github.com/fatih/color"
 	"github.com/cloudfoundry/cli/plugin"
+	"github.com/fatih/color"
 )
 
 var (
 	maxRestartWaitCycles = 120
 	printLine            = fmt.Println
 	printFormatted       = fmt.Printf
-	spinner 			 = NewSpinner(os.Stdout)
+	spinner              = NewSpinner(os.Stdout)
 )
 
 type Instance struct {
@@ -29,7 +29,7 @@ type Instance struct {
 
 type Instances map[string]Instance
 
-type RollingRestart struct {}
+type RollingRestart struct{}
 
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
@@ -134,7 +134,7 @@ func printErrorAndExit(message string) {
 }
 
 func setFlagsAndReturnAppName(args []string) (string, error) {
-	rrsFlags :=  flag.NewFlagSet("rolling-restart", flag.ExitOnError)
+	rrsFlags := flag.NewFlagSet("rolling-restart", flag.ExitOnError)
 	maxCycles := rrsFlags.Int("max-cycles", maxRestartWaitCycles, "Maximum number of cycles to wait when checking for restart status. (Optional)")
 	rrsFlags.Parse(args[1:])
 

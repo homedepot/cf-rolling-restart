@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"io"
+
+	"github.com/fatih/color"
 )
 
 var states = map[string]string{
-	"|": "/",
-	"/": "-",
-	"-": "\\",
+	"|":  "/",
+	"/":  "-",
+	"-":  "\\",
 	"\\": "|"}
 
 type Spinner struct {
-	writer		io.Writer
-	state 		string
+	writer io.Writer
+	state  string
 }
 
 func NewSpinner(writer io.Writer) *Spinner {
