@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+# shellcheck disable=1091
+source script/settings
+
+# shellcheck disable=1091
+source script/common
+
+echo ""
+echo "building"
+
+function goformat() {
+    FMT='gofmt -w'
+    if  builtin type -p goimports &>/dev/null; then
+        FMT='goimports -w=true'
+    fi
+    if  builtin type -p xargs &>/dev/null; then
+        echo "formatting"
+        find ./ -name "*.go" | grep -v /vendor/ | xargs -I % /usr/bin/env bash -c "$FMT %"
+    fi
+}
+
+function govet() {
+    if  builtin type -p xargs &>/dev/null; then
+        echo "vetting"
+        find . -name "*.go" | grep -v /vendor/ | xargs go tool vet -all
+    fi
+}
+
+function scheck() {
+    # run shellcheck
+    if  builtin type -p shellcheck &>/dev/null; then
+        echo "shellcheck"
+        for file in ./script/*
+        do
+            shellcheck "$file"
+        done
+    fi
+}
+
+goformat
+govet
+scheck
+
+./script/test
+
+gobuild
+
+echo ""
+echo "done!"

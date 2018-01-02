@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+# shellcheck disable=1091
+source script/settings
+
+function gobuild() {
+    mkdir -p ./bin
+    echo "compiling"
+    go build -ldflags "$LD_FLAGS" -o "./bin/$OUTPUT" .
+}
