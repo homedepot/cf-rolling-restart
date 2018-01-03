@@ -1,0 +1,27 @@
+- authors:
+  - contact: Winston_R_Milling@homedepot.com
+    homepage: https://github.com/wrmilling
+    name: Winston R. Milling
+  binaries:
+  - checksum: {{darwin_amd64_checksum}}
+    platform: osx
+    url: {{darwin_amd64_url}}
+  - checksum: {{windows_386_checksum}}
+    platform: win32
+    url: {{windows_386_url}}
+  - checksum: {{windows_amd64_checksum}}
+    platform: win64
+    url: {{windows_amd64_url}}
+  - checksum: {{linux_386_checksum}}
+    platform: linux32
+    url: {{windows_amd64_url}}
+  - checksum: {{linux_amd64_checksum}}
+    platform: linux64
+    url: {{linux_amd64_url}}
+  company: The Home Depot
+  created: 2017-12-26T00:00:00Z
+  description: cf-rolling-restart performs a zero-downtime restart of PCF application instances
+  homepage: https://github.com/homedepot/cf-rolling-restart
+  name: cf-rolling-restart
+  updated: {{updated}}
+  version: {{version}}
