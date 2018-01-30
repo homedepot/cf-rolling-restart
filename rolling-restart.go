@@ -1,24 +1,31 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"time"
-	"sort"
-	"flag"
-	"errors"
-	"strings"
 	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"os"
+	"sort"
+	"strings"
+	"time"
 
-	"github.com/fatih/color"
+	"regexp"
+	"strconv"
+
 	"github.com/cloudfoundry/cli/plugin"
+	"github.com/fatih/color"
 )
 
 var (
+	Version    = "0.0.0"
+	GitCommit  = "HEAD"
+	BuildStamp = "UNKNOWN"
+
 	maxRestartWaitCycles = 120
 	printLine            = fmt.Println
 	printFormatted       = fmt.Printf
-	spinner 			 = NewSpinner(os.Stdout)
+	spinner              = NewSpinner(os.Stdout)
 )
 
 type Instance struct {
@@ -29,16 +36,14 @@ type Instance struct {
 
 type Instances map[string]Instance
 
-type RollingRestart struct {}
+type RollingRestart struct {
+	Version plugin.VersionType
+}
 
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name: "RollingRestartPlugin",
-		Version: plugin.VersionType{
-			Major: 1,
-			Minor: 0,
-			Build: 0,
-		},
+		Name:    "RollingRestartPlugin",
+		Version: c.Version,
 		MinCliVersion: plugin.VersionType{
 			Major: 6,
 			Minor: 7,
@@ -134,7 +139,7 @@ func printErrorAndExit(message string) {
 }
 
 func setFlagsAndReturnAppName(args []string) (string, error) {
-	rrsFlags :=  flag.NewFlagSet("rolling-restart", flag.ExitOnError)
+	rrsFlags := flag.NewFlagSet("rolling-restart", flag.ExitOnError)
 	maxCycles := rrsFlags.Int("max-cycles", maxRestartWaitCycles, "Maximum number of cycles to wait when checking for restart status. (Optional)")
 	rrsFlags.Parse(args[1:])
 
@@ -246,6 +251,34 @@ func getKeysFor(m map[string]Instance) []string {
 	return keys
 }
 
+var versionRegexp = regexp.MustCompile(`^v?([0-9]+).([0-9]+).([0-9]+)$`)
+
 func main() {
-	plugin.Start(new(RollingRestart))
+
+	submatches := versionRegexp.FindAllStringSubmatch(Version, -1)
+	if len(submatches) == 0 || len(submatches[0]) != 4 {
+		printErrorAndExit("unable to parse version `" + Version + "`")
+	}
+	major, err := strconv.Atoi(submatches[0][1])
+	if err != nil {
+		printErrorAndExit("unable to parse major version `" + Version + "`")
+	}
+	minor, err := strconv.Atoi(submatches[0][1])
+	if err != nil {
+		printErrorAndExit("unable to parse minor version `" + Version + "`")
+	}
+	build, err := strconv.Atoi(submatches[0][1])
+	if err != nil {
+		printErrorAndExit("unable to parse build version `" + Version + "`")
+	}
+
+	rollingRestart := &RollingRestart{
+		plugin.VersionType{
+			Major: major,
+			Minor: minor,
+			Build: build,
+		},
+	}
+
+	plugin.Start(rollingRestart)
 }

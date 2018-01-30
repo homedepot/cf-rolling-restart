@@ -1,30 +1,30 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
-	"fmt"
-	"bytes"
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-	"github.com/cloudfoundry/cli/plugin/pluginfakes"
 	"github.com/cloudfoundry/cli/cf/errors"
+	"github.com/cloudfoundry/cli/plugin/pluginfakes"
+	"github.com/stretchr/testify/require"
 )
 
 var (
-	rr *RollingRestart
+	rr      *RollingRestart
 	cliConn *pluginfakes.FakeCliConnection
 
-	output []string
-	spinnerBuffer bytes.Buffer
+	output                 []string
+	spinnerBuffer          bytes.Buffer
 	subCommandOutputBuffer bytes.Buffer
 
-	twoInstanceResponse = []string{"{", "\"0\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990275", "},", "\"1\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990327", "}", "}"}
+	twoInstanceResponse      = []string{"{", "\"0\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990275", "},", "\"1\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990327", "}", "}"}
 	alwaysRestartingResponse = []string{"{", "\"0\": {", "\"state\": \"STARTING\",", "\"uptime\": 5,", "\"since\": 1511990275", "},", "\"1\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990327", "}", "}"}
-	singleInstanceResponse = []string{"{", "\"0\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990275", "}", "}"}
-	badInstanceResponse = []string{"bad", "response"}
+	singleInstanceResponse   = []string{"{", "\"0\": {", "\"state\": \"RUNNING\",", "\"uptime\": 5,", "\"since\": 1511990275", "}", "}"}
+	badInstanceResponse      = []string{"bad", "response"}
 )
 
 type testError struct {
@@ -44,10 +44,10 @@ func TestMain(m *testing.M) {
 		output = []string{}
 
 		oldPrintln := printLine
-		defer func () { printLine = oldPrintln }()
+		defer func() { printLine = oldPrintln }()
 
 		oldPrintf := printFormatted
-		defer func () { printFormatted = oldPrintf }()
+		defer func() { printFormatted = oldPrintf }()
 
 		printLine = printlnStub
 		printFormatted = printfStub
@@ -56,10 +56,10 @@ func TestMain(m *testing.M) {
 	fakeSpinner := NewSpinner(&spinnerBuffer)
 
 	oldMaxRestartWaitCycles := maxRestartWaitCycles
-	defer func () { maxRestartWaitCycles = oldMaxRestartWaitCycles }()
+	defer func() { maxRestartWaitCycles = oldMaxRestartWaitCycles }()
 
 	oldSpinner := spinner
-	defer func () { spinner = oldSpinner }()
+	defer func() { spinner = oldSpinner }()
 
 	maxRestartWaitCycles = 1
 	spinner = fakeSpinner
@@ -271,7 +271,7 @@ func TestRollingRestart_Run_InstanceDoesNotRestartCustomCycleLimit(t *testing.T)
 		setupHasSpaceStub(true, false)
 		setupCliCommandWihtoutTerminalOutputStub(true, true, alwaysRestartingResponse)
 		setupCliCommandStub(true)
-		rr.Run(cliConn, []string{"rolling-restart","--max-cycles","2", "testApp"})
+		rr.Run(cliConn, []string{"rolling-restart", "--max-cycles", "2", "testApp"})
 		return
 	}
 
@@ -298,7 +298,7 @@ func TestRollingRestart_Run_SingleInstanceThrowError(t *testing.T) {
 }
 
 func expectExitCodeOne(testName string, t *testing.T) {
-	cmd := exec.Command(os.Args[0], "-test.run=" + testName)
+	cmd := exec.Command(os.Args[0], "-test.run="+testName)
 	cmd.Env = append(os.Environ(), "TEST_OS_EXIT=1")
 	cmd.Stdout = &subCommandOutputBuffer
 	err := cmd.Run()
@@ -353,7 +353,7 @@ func setupCliCommandWihtoutTerminalOutputStub(getGuidSuccess bool, getInstanceSt
 
 func setupCliCommandStub(restartSuccess bool) {
 	cliConn.CliCommandStub = func(args ...string) ([]string, error) {
-		if args[0] == "restart-app-instance" && args[1] == "testApp" && ( args[2] == "0" || args[2] == "1") && restartSuccess {
+		if args[0] == "restart-app-instance" && args[1] == "testApp" && (args[2] == "0" || args[2] == "1") && restartSuccess {
 			return nil, nil
 		}
 		return nil, &testError{}

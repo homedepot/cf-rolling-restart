@@ -23,4 +23,6 @@ The flag `--max-cycles` augments the number of times the plugin will check to se
 
 ## Compiling
 
-To build for all platforms please run (from a Mac or Linux system) `./scripts/build-all.sh` from the project root.
+To build and test for your current platform please run `./script/cibuild` from the project root.
+
+To build and install locally run `./script/install`.

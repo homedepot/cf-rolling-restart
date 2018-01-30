@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+# shellcheck disable=1091
+source script/settings
+
+function gobuild() {
+    local arch="$1"
+    local platform="$2"
+
+    local fname="./bin/${OUTPUT}-${platform}-${arch}"
+
+    #add exe to windows output
+    if [[ "$platform" == "windows" ]]; then
+        fname="${fname}.exe"
+    fi
+
+    echo "building $fname" >&2
+
+    CGO_ENABLED=0 GOOS="${platform}" GOARCH="${arch}" \
+    go build -ldflags "$LD_FLAGS" -o "$fname" .
+
+    echo "$fname"
+
+}
+
+function gorelease() {
+
+    rm -rf ./bin
+    mkdir -p ./bin
+
+    NOW="$(TZ=UC date +'%Y-%m-%dT%TZ')"
+
+    SED_OPTS=()
+
+    SED_OPTS+=("-e s|{{updated}}|${NOW}|g" )
+    SED_OPTS+=("-e s|{{version}}|${VERSION}|g" )
+
+    for arch in "${GOARCHES[@]}"; do
+      for platform in "${GOOSES[@]}"; do
+
+        filename="$(gobuild "$arch" "$platform")"
+        sha1="$(shasum -a 1 "$filename" | cut -d ' ' -f 1)"
+        nameonly="$(basename "$filename")"
+        url="${GITHUB_RELEASES_ROOT}/${TAG}/${nameonly}"
+
+        SED_OPTS+=("-e s|{{${platform}_${arch}_checksum}}|${sha1}|g" )
+        SED_OPTS+=("-e s|{{${platform}_${arch}_url}}|${url}|g" )
+
+      done
+    done
+
+    yml="$(sed "${SED_OPTS[@]}" repo-index.template.yml)"
+
+    echo "updating repo-index"
+
+    echo "$yml" > repo-index.yml
+
+}
+
+if ! builtin type -p shasum &>/dev/null; then
+    echo "ERROR: shasum not installed" >&2
+    exit 1
+fi
+
+echo ""
+echo "releasing"
+
+gorelease
+
+echo ""
+echo "done!"
