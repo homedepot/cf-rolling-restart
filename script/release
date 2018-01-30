@@ -45,7 +45,7 @@ function gorelease() {
 
         filename="$(gobuild "$arch" "$platform")"
         sha1="$(shasum -a 1 "$filename" | cut -d ' ' -f 1)"
-        nameonly="$(basename $filename)"
+        nameonly="$(basename "$filename")"
         url="${GITHUB_RELEASES_ROOT}/${TAG}/${nameonly}"
 
         SED_OPTS+=("-e s|{{${platform}_${arch}_checksum}}|${sha1}|g" )
