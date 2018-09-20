@@ -21,7 +21,7 @@
   company: The Home Depot
   created: 2017-12-26T00:00:00Z
   description: cf-rolling-restart performs a zero-downtime restart of PCF application instances
-  homepage: https://github.com/homedepot/cf-rolling-restart
+  homepage: https://github.homedepot.com/wrm6768/cf-rolling-restart
   name: cf-rolling-restart
   updated: {{updated}}
   version: {{version}}
