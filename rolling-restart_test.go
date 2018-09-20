@@ -89,11 +89,11 @@ func TestRollingRestart_Run_Success(t *testing.T) {
 	require.Equal(t, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}, cliConn.CliCommandWithoutTerminalOutputArgsForCall(3))
 
 	require.Equal(t, 4, len(output))
-	require.Equal(t, "Beginning restart of app instances for [testApp].\n", output[0])
-	require.Equal(t, "Checking status of instance [0].\n", output[1])
-	require.Equal(t, "Checking status of instance [1].\n", output[2])
-	require.Equal(t, "Finished restart of app instances for [testApp].", output[3])
-	require.Equal(t, "\r/\x1b[32;1m\rOK\n\x1b[0m\r-\x1b[32;1m\rOK\n\x1b[0m", spinnerBuffer.String())
+	require.Equal(t, "Beginning restart of app instances for testApp.\n", output[0])
+	require.Equal(t, "Checking status of instance 0.\n", output[1])
+	require.Equal(t, "Checking status of instance 1.\n", output[2])
+	require.Equal(t, "Finished restart of app instances for testApp.", output[3])
+	require.Equal(t, "\r/\rOK\n\r-\rOK\n", spinnerBuffer.String())
 }
 
 func TestRollingRestart_Run_NoAppNameProvided(t *testing.T) {
@@ -361,11 +361,11 @@ func setupCliCommandStub(restartSuccess bool) {
 }
 
 func printlnStub(a ...interface{}) (n int, err error) {
-	output = append(output, fmt.Sprintln(a))
+	output = append(output, fmt.Sprintln(a...))
 	return 0, nil
 }
 
 func printfStub(format string, a ...interface{}) (n int, err error) {
-	output = append(output, fmt.Sprintf(format, a))
+	output = append(output, fmt.Sprintf(format, a...))
 	return 0, nil
 }

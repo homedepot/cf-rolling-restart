@@ -36,6 +36,6 @@ func TestSpinner_Done(t *testing.T) {
 	b.Reset()
 
 	spinner.Done()
-	require.Equal(t, "\x1b[32;1m\rOK\n\x1b[0m", b.String(), "Done message should display over spinner.")
+	require.Equal(t, "\rOK\n", b.String(), "Done message should display over spinner.")
 
 }
