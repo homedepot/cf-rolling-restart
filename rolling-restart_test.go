@@ -93,7 +93,7 @@ func TestRollingRestart_Run_Success(t *testing.T) {
 	require.Equal(t, "Checking status of instance 0.\n", output[1])
 	require.Equal(t, "Checking status of instance 1.\n", output[2])
 	require.Equal(t, "Finished restart of app instances for testApp.", output[3])
-	require.Equal(t, "\r/\rOK\n\r-\rOK\n", spinnerBuffer.String())
+	require.Equal(t, "\r/\x1b[32;1m\rOK\n\x1b[0m\r-\x1b[32;1m\rOK\n\x1b[0m", spinnerBuffer.String())
 }
 
 func TestRollingRestart_Run_NoAppNameProvided(t *testing.T) {
