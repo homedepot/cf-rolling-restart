@@ -1,4 +1,4 @@
-# rolling-restart
+# Rolling Restart for CF
 
 CF plugin for zero downtime application restarts.
 
@@ -26,3 +26,11 @@ The flag `--max-cycles` augments the number of times the plugin will check to se
 To build and test for your current platform please run `./script/cibuild` from the project root.
 
 To build and install locally run `./script/install`.
+
+## Contributing 
+
+Check out the [contributing](CONTRIBUTING.md) readme for information on how to contriubte to the project. 
+
+## License 
+
+This project is released under the Apache2 free software license. More information can be found in the [LICENSE](LICENSE) file.
