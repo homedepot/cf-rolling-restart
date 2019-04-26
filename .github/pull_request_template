@@ -1,14 +1,18 @@
-Fixes # [TrackerID/Issue #]
-and/or
+<!-- Thank you for your contribution to cf-rolling-restart! Please replace {Please write here} with your description -->
 
-Adds # [TrackerID/Issue #]
-and/or
+### What was a problem?
 
-Removes # [TrackerID/Issue #]
-and/or
+{Please write here}
 
-Changes # [TrackerID/Issue #]
+### How this PR fixes the problem?
 
+{Please write here}
 
-Proposed Changes
-- 
+### Check lists (check `x` in `[ ]` of list items)
+
+- [ ] Test passed
+- [ ] Coding style (indentation, etc)
+
+### Additional Comments (if any)
+
+{Please write here}
