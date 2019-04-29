@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+IFS=$'\n\t'
+
+cd "$(dirname "$0")"/..
+
+ROOT_DIR="$PWD"
+
+# shellcheck disable=2034
+OUTPUT=cf-rolling-restart
+
+# shellcheck disable=2034
+LD_FLAGS=""
+
+# shellcheck disable=2034
+GOARCHES=(
+    "386"
+    "amd64"
+)
+
+# shellcheck disable=2034
+GOOSES=(
+    "windows"
+    "linux"
+    "darwin"
+)
+
+# shellcheck disable=2034
+GITHUB_RELEASES_ROOT="https://github.com/homedepot/cf-rolling-restart/releases/download"
+
+# shellcheck disable=2034
+FALLBACK_VERSION="${VERSION:-0.0.0}"
+
+if builtin type -p date &>/dev/null; then
+    BUILDSTAMP=$(date -u +%Y%m%d%H%M%S)
+fi
+
+if builtin type -p git &>/dev/null; then
+
+    if [ -f "$ROOT_DIR/.git/HEAD" ]; then
+
+        GIT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        GIT_COMMIT="$(git log --format="%H" -n 1 | cut -c1-12)"
+        GIT_DIRTY="$( (test -n "$(git status --porcelain)" && echo "+CHANGES") || true)"
+        APP_VERSION="$( (git describe --tags --abbrev=0 2> /dev/null || true) | head -n 1)"
+        LD_FLAGS="-X main.GitCommit=$GIT_COMMIT$GIT_DIRTY -X main.GitBranch=$GIT_BRANCH"
+    fi
+fi
+
+VERSION="${APP_VERSION:-$FALLBACK_VERSION}"
+VERSION="${VERSION#v}"
+
+if [ "$BUILDSTAMP" != "" ]; then
+    LD_FLAGS="$LD_FLAGS -X main.BuildStamp=$BUILDSTAMP"
+fi
+
+if [ "$VERSION" != "" ]; then
+    LD_FLAGS="$LD_FLAGS -X main.Version=$VERSION"
+fi
+
+# shellcheck disable=2034
+TAG="${TAG:-v${VERSION}}"
