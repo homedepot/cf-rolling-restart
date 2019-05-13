@@ -18,3 +18,4 @@ bin
 /cf-rolling-restart
 .idea
 .vscode
+coverage.txt

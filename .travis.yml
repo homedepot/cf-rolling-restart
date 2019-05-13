@@ -5,3 +5,6 @@ go:
 
 script: 
 - ./script/cibuild
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
