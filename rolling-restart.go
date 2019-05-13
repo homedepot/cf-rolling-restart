@@ -29,7 +29,7 @@ var (
 	spinner              = NewSpinner(os.Stdout)
 )
 
-// Basic instance information for a CF application which includes
+// Instance provides basicinformation for a CF application which includes
 // the current state as well as uptime and last updated time.
 type Instance struct {
 	State  string `json:"state"`
@@ -37,15 +37,15 @@ type Instance struct {
 	Since  int    `json:"since"`
 }
 
-// A Grouping of CF Instances.
+// Instances is grouping of CF Instance for an application.
 type Instances map[string]Instance
 
-// Basic structure required by CF CLI Plugins.
+// RollingRestart provides basic structure required by CF CLI Plugins.
 type RollingRestart struct {
 	Version plugin.VersionType
 }
 
-// Returns the pertinent metadata for the CF CLI Plugin architecture.
+// GetMetadata returns the pertinent metadata for the CF CLI Plugin architecture.
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name:    "RollingRestartPlugin",
@@ -68,7 +68,7 @@ func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	}
 }
 
-// Main code for Rolling Restart, exposes all required actions for a plugin.
+// Run executes the main code for Rolling Restart, exposes all required actions for a plugin.
 func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 	if args[0] != "rolling-restart" && args[0] != "rrs" {
 		return
