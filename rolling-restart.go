@@ -17,6 +17,7 @@ import (
 	"github.com/fatih/color"
 )
 
+// Basic variables for cf-rolling-restart.
 var (
 	Version    = "1.0.2"
 	GitCommit  = "HEAD"
@@ -28,18 +29,23 @@ var (
 	spinner              = NewSpinner(os.Stdout)
 )
 
+// Basic instance infromation for a CF application which includes
+// the current state as well as uptime and last updated time.
 type Instance struct {
 	State  string `json:"state"`
 	Uptime int    `json:"uptime"`
 	Since  int    `json:"since"`
 }
 
+// A Grouping of CF Instances.
 type Instances map[string]Instance
 
+// Basic structure required by CF CLI Plugins.
 type RollingRestart struct {
 	Version plugin.VersionType
 }
 
+// Returns the pertinent metadata for the CF CLI Plugin architecture.
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name:    "RollingRestartPlugin",
@@ -62,6 +68,7 @@ func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	}
 }
 
+// Main code for Rolling Restart, exposes all required actions for a plugin.
 func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 	if args[0] != "rolling-restart" && args[0] != "rrs" {
 		return
@@ -144,7 +151,7 @@ func setFlagsAndReturnAppName(args []string) (string, error) {
 	rrsFlags.Parse(args[1:])
 
 	if !rrsFlags.Parsed() {
-		return "", errors.New("Failed parsing command line arguements.")
+		return "", errors.New("Failed parsing command line arguments.")
 	}
 
 	maxRestartWaitCycles = *maxCycles
