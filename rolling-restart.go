@@ -29,7 +29,7 @@ var (
 	spinner              = NewSpinner(os.Stdout)
 )
 
-// Basic instance infromation for a CF application which includes
+// Instance provides basicinformation for a CF application which includes
 // the current state as well as uptime and last updated time.
 type Instance struct {
 	State  string `json:"state"`
@@ -37,15 +37,15 @@ type Instance struct {
 	Since  int    `json:"since"`
 }
 
-// A Grouping of CF Instances.
+// Instances is grouping of CF Instance for an application.
 type Instances map[string]Instance
 
-// Basic structure required by CF CLI Plugins.
+// RollingRestart provides basic structure required by CF CLI Plugins.
 type RollingRestart struct {
 	Version plugin.VersionType
 }
 
-// Returns the pertinent metadata for the CF CLI Plugin architecture.
+// GetMetadata returns the pertinent metadata for the CF CLI Plugin architecture.
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name:    "RollingRestartPlugin",
@@ -68,16 +68,16 @@ func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	}
 }
 
-// Main code for Rolling Restart, exposes all required actions for a plugin.
+// Run executes the main code for Rolling Restart, exposes all required actions for a plugin.
 func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 	if args[0] != "rolling-restart" && args[0] != "rrs" {
 		return
 	}
 
 	var appName string
-	var appGuid string
+	var appGUID string
 	var instances Instances
-	var instanceIds []string
+	var instanceIDs []string
 	var isRunning bool
 	var restarted bool
 	var err error
@@ -90,34 +90,34 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 		printErrorAndExit(err.Error())
 	}
 
-	if appGuid, err = getAppGuid(conn, appName); err != nil {
+	if appGUID, err = getappGUID(conn, appName); err != nil {
 		printErrorAndExit(err.Error())
 	}
 
-	if instances, err = getInstances(conn, appGuid); err != nil {
+	if instances, err = getInstances(conn, appGUID); err != nil {
 		printFormatted("Failed to get the instance information for %s.\n", appName)
 		printErrorAndExit(err.Error())
 	}
 
-	if instanceIds = getKeysFor(instances); len(instanceIds) < 2 {
+	if instanceIDs = getKeysFor(instances); len(instanceIDs) < 2 {
 		printErrorAndExit("There are too few instances to ensure zero-downtime, use `cf restart APP_NAME` if you are OK with downtime.")
 	}
 
 	printFormatted("Beginning restart of app instances for %s.\n", appName)
 
-	for _, instanceId := range instanceIds {
-		if err = restartInstance(conn, appName, instanceId); err != nil {
-			printFormatted("Failed to restart instance %s.\n", instanceId)
+	for _, instanceID := range instanceIDs {
+		if err = restartInstance(conn, appName, instanceID); err != nil {
+			printFormatted("Failed to restart instance %s.\n", instanceID)
 			printErrorAndExit(err.Error())
 		}
 
-		printFormatted("Checking status of instance %s.\n", instanceId)
+		printFormatted("Checking status of instance %s.\n", instanceID)
 
 		isRunning = false
 		for i := 0; i < maxRestartWaitCycles; i++ {
 			spinner.Next()
 
-			if isRunning, err = isInstanceRunning(conn, appGuid, instanceId); err != nil {
+			if isRunning, err = isInstanceRunning(conn, appGUID, instanceID); err != nil {
 				printFormatted("Failed to get the instance information for %s.\n", appName)
 				printErrorAndExit(err.Error())
 			}
@@ -201,45 +201,45 @@ func validateCLISession(conn plugin.CliConnection) error {
 	return nil
 }
 
-func isInstanceRunning(conn plugin.CliConnection, appGuid string, instanceId string) (bool, error) {
+func isInstanceRunning(conn plugin.CliConnection, appGUID string, instanceID string) (bool, error) {
 	var instanceStatuses Instances
 	var err error
 
-	if instanceStatuses, err = getInstances(conn, appGuid); err != nil {
+	if instanceStatuses, err = getInstances(conn, appGUID); err != nil {
 		return false, err
 	}
 
-	instance := instanceStatuses[instanceId]
+	instance := instanceStatuses[instanceID]
 	running := instance.State == "RUNNING" && instance.Uptime < 10
 	return running, nil
 }
 
-func restartInstance(conn plugin.CliConnection, appName string, instanceId string) error {
-	_, err := conn.CliCommand("restart-app-instance", appName, instanceId)
+func restartInstance(conn plugin.CliConnection, appName string, instanceID string) error {
+	_, err := conn.CliCommand("restart-app-instance", appName, instanceID)
 	return err
 }
 
-func getAppGuid(conn plugin.CliConnection, appName string) (string, error) {
-	var appGuid []string
+func getappGUID(conn plugin.CliConnection, appName string) (string, error) {
+	var appGUID []string
 	var err error
 
-	if appGuid, err = conn.CliCommandWithoutTerminalOutput("app", appName, "--guid"); err != nil {
+	if appGUID, err = conn.CliCommandWithoutTerminalOutput("app", appName, "--guid"); err != nil {
 		return "", err
 	}
 
-	return appGuid[0], nil
+	return appGUID[0], nil
 }
 
-func getInstances(conn plugin.CliConnection, appGuid string) (Instances, error) {
+func getInstances(conn plugin.CliConnection, appGUID string) (Instances, error) {
 	var instances Instances
 
-	instancesCurlUrl := fmt.Sprintf("/v2/apps/%s/instances", appGuid)
-	instanceJson, curlErr := conn.CliCommandWithoutTerminalOutput("curl", "-X", "GET", instancesCurlUrl)
+	instancesCurlURL := fmt.Sprintf("/v2/apps/%s/instances", appGUID)
+	instanceJSON, curlErr := conn.CliCommandWithoutTerminalOutput("curl", "-X", "GET", instancesCurlURL)
 	if curlErr != nil {
 		return nil, curlErr
 	}
 
-	unmarshallErr := json.Unmarshal([]byte(strings.Join(instanceJson, "")), &instances)
+	unmarshallErr := json.Unmarshal([]byte(strings.Join(instanceJSON, "")), &instances)
 	if unmarshallErr != nil {
 		return nil, unmarshallErr
 	}

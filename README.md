@@ -36,7 +36,7 @@ To build and install locally run `./script/install`.
 
 ## Contributing 
 
-Check out the [contributing](CONTRIBUTING.md) readme for information on how to contriubte to the project. 
+Check out the [contributing](CONTRIBUTING.md) readme for information on how to contribute to the project. 
 
 ## License 
 

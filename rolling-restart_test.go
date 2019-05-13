@@ -337,9 +337,9 @@ func setupIsLoggedInStub(isLoggedIn bool, throwError bool) {
 	}
 }
 
-func setupCliCommandWihtoutTerminalOutputStub(getGuidSuccess bool, getInstanceStatusSuccess bool, instanceResponse []string) {
+func setupCliCommandWihtoutTerminalOutputStub(getGUIDSuccess bool, getInstanceStatusSuccess bool, instanceResponse []string) {
 	cliConn.CliCommandWithoutTerminalOutputStub = func(args ...string) ([]string, error) {
-		if reflect.DeepEqual(args, []string{"app", "testApp", "--guid"}) && getGuidSuccess {
+		if reflect.DeepEqual(args, []string{"app", "testApp", "--guid"}) && getGUIDSuccess {
 			return []string{"valid-app-guid"}, nil
 		} else if reflect.DeepEqual(args, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}) && getInstanceStatusSuccess {
 			return instanceResponse, nil
