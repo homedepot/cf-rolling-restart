@@ -1,5 +1,7 @@
 # Rolling Restart for CF
 
+[![Build Status](https://travis-ci.org/homedepot/cf-rolling-restart.svg?branch=master)](https://travis-ci.org/homedepot/cf-rolling-restart)
+
 CF plugin for zero downtime application restarts.
 
 This was made to fill a the gap in zero-downtime restarts for the PCF CLI. It will restart your application one instance at a time until each instance is up. The plugin should provide feedback through the CLI through the whole process.
