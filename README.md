@@ -1,4 +1,4 @@
-[![Go Lang Version](https://img.shields.io/badge/go-1.12-00ADD8.svg?style=plastic)](http://golang.com)
+[![Go Lang Version](https://img.shields.io/badge/go-1.12-00ADD8.svg?style=flat)](http://golang.com)
 [![Go Report Card](https://goreportcard.com/badge/github.com/homedepot/cf-rolling-restart)](https://goreportcard.com/report/github.com/homedepot/cf-rolling-restart)
 [![Build Status](https://travis-ci.org/homedepot/cf-rolling-restart.svg?branch=master)](https://travis-ci.org/homedepot/cf-rolling-restart) 
 
