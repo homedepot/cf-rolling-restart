@@ -1,4 +1,11 @@
-# Rolling Restart for CF
+
+
+# Rolling Restart for CF 
+[![Go Lang Version](https://img.shields.io/badge/go-1.12-00ADD8.svg?style=flat)](http://golang.com) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/homedepot/cf-rolling-restart)](https://goreportcard.com/report/github.com/homedepot/cf-rolling-restart) 
+[![Code Coverage](https://img.shields.io/codecov/c/github/homedepot/cf-rolling-restart.svg?style=flat)](https://codecov.io/gh/homedepot/goel)
+[![Build Status](https://travis-ci.org/homedepot/cf-rolling-restart.svg?branch=master)](https://travis-ci.org/homedepot/cf-rolling-restart) 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat)](LICENSE)
 
 CF plugin for zero downtime application restarts.
 

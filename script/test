@@ -5,4 +5,4 @@ IFS=$'\n\t'
 
 echo "testing"
 
-go test -test.v .
+go test -test.v -coverprofile=coverage.txt -covermode=count .
