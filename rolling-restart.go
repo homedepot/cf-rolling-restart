@@ -113,7 +113,6 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 
 		printFormatted("Checking status of instance %s.\n", instanceID)
 
-		isRunning = false
 		for i := 0; i < maxRestartWaitCycles; i++ {
 			spinner.Next()
 
