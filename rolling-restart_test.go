@@ -314,9 +314,8 @@ func setupHasSpaceStub(hasSpace bool, throwError bool) {
 	cliConn.HasSpaceStub = func() (bool, error) {
 		if throwError {
 			return false, errors.New("CLI FAILURE")
-		} else {
-			return hasSpace, nil
 		}
+		return hasSpace, nil
 	}
 }
 
@@ -324,9 +323,8 @@ func setupHasOrganizationStub(hasOrganization bool, throwError bool) {
 	cliConn.HasOrganizationStub = func() (bool, error) {
 		if throwError {
 			return false, errors.New("CLI FAILURE")
-		} else {
-			return hasOrganization, nil
 		}
+		return hasOrganization, nil
 	}
 }
 
@@ -334,9 +332,8 @@ func setupIsLoggedInStub(isLoggedIn bool, throwError bool) {
 	cliConn.IsLoggedInStub = func() (bool, error) {
 		if throwError {
 			return false, errors.New("CLI FAILURE")
-		} else {
-			return isLoggedIn, nil
 		}
+		return isLoggedIn, nil
 	}
 }
 
