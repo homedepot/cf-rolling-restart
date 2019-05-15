@@ -27,6 +27,10 @@ var (
 	printLine            = fmt.Println
 	printFormatted       = fmt.Printf
 	spinner              = NewSpinner(os.Stdout)
+	exit                 = os.Exit
+	printRedBold         = color.New(color.FgRed, color.Bold).Println
+	successfulExit       = 0
+	failureExit          = 1
 )
 
 // Instance provides basicinformation for a CF application which includes
@@ -74,6 +78,13 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 		return
 	}
 
+	var exitCode int
+	if exitCode = execute(conn, args); exitCode != 0 {
+		exit(exitCode)
+	}
+}
+
+func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 	var appName string
 	var appGUID string
 	var instances Instances
@@ -83,24 +94,29 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 	var err error
 
 	if appName, err = setFlagsAndReturnAppName(args); err != nil {
-		printErrorAndExit(err.Error())
+		printError(err.Error())
+		return failureExit
 	}
 
 	if err = validateCLISession(conn); err != nil {
-		printErrorAndExit(err.Error())
+		printError(err.Error())
+		return failureExit
 	}
 
 	if appGUID, err = getappGUID(conn, appName); err != nil {
-		printErrorAndExit(err.Error())
+		printError(err.Error())
+		return failureExit
 	}
 
 	if instances, err = getInstances(conn, appGUID); err != nil {
 		printFormatted("Failed to get the instance information for %s.\n", appName)
-		printErrorAndExit(err.Error())
+		printError(err.Error())
+		return failureExit
 	}
 
 	if instanceIDs = getKeysFor(instances); len(instanceIDs) < 2 {
-		printErrorAndExit("There are too few instances to ensure zero-downtime, use `cf restart APP_NAME` if you are OK with downtime.")
+		printError("There are too few instances to ensure zero-downtime, use `cf restart APP_NAME` if you are OK with downtime.")
+		return failureExit
 	}
 
 	printFormatted("Beginning restart of app instances for %s.\n", appName)
@@ -108,7 +124,8 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 	for _, instanceID := range instanceIDs {
 		if err = restartInstance(conn, appName, instanceID); err != nil {
 			printFormatted("Failed to restart instance %s.\n", instanceID)
-			printErrorAndExit(err.Error())
+			printError(err.Error())
+			return failureExit
 		}
 
 		printFormatted("Checking status of instance %s.\n", instanceID)
@@ -118,7 +135,8 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 
 			if isRunning, err = isInstanceRunning(conn, appGUID, instanceID); err != nil {
 				printFormatted("Failed to get the instance information for %s.\n", appName)
-				printErrorAndExit(err.Error())
+				printError(err.Error())
+				return failureExit
 			}
 
 			if isRunning {
@@ -131,17 +149,19 @@ func (c *RollingRestart) Run(conn plugin.CliConnection, args []string) {
 		}
 
 		if restarted == false {
-			printErrorAndExit(fmt.Sprintf("Application did not restart within %d Second(s), failing out. Check your current application state.\n", maxRestartWaitCycles))
+			printError(fmt.Sprintf("Application did not restart within %d Second(s), failing out. Check your current application state.\n", maxRestartWaitCycles))
+			return failureExit
 		}
 	}
 
 	printFormatted("Finished restart of app instances for %s.", appName)
+
+	return successfulExit
 }
 
-func printErrorAndExit(message string) {
-	color.New(color.FgRed, color.Bold).Println("FAILED")
+func printError(message string) {
+	printRedBold("FAILED")
 	printLine(message)
-	os.Exit(1)
 }
 
 func setFlagsAndReturnAppName(args []string) (string, error) {
@@ -263,19 +283,23 @@ func main() {
 
 	submatches := versionRegexp.FindAllStringSubmatch(Version, -1)
 	if len(submatches) == 0 || len(submatches[0]) != 4 {
-		printErrorAndExit("unable to parse version `" + Version + "`")
+		printError("unable to parse version `" + Version + "`")
+		exit(failureExit)
 	}
 	major, err := strconv.Atoi(submatches[0][1])
 	if err != nil {
-		printErrorAndExit("unable to parse major version `" + Version + "`")
+		printError("unable to parse major version `" + Version + "`")
+		exit(failureExit)
 	}
 	minor, err := strconv.Atoi(submatches[0][1])
 	if err != nil {
-		printErrorAndExit("unable to parse minor version `" + Version + "`")
+		printError("unable to parse minor version `" + Version + "`")
+		exit(failureExit)
 	}
 	build, err := strconv.Atoi(submatches[0][1])
 	if err != nil {
-		printErrorAndExit("unable to parse build version `" + Version + "`")
+		printError("unable to parse build version `" + Version + "`")
+		exit(failureExit)
 	}
 
 	rollingRestart := &RollingRestart{
