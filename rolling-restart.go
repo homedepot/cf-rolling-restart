@@ -269,11 +269,11 @@ func main() {
 	if err != nil {
 		printErrorAndExit("unable to parse major version `" + Version + "`")
 	}
-	minor, err := strconv.Atoi(submatches[0][1])
+	minor, err := strconv.Atoi(submatches[0][2])
 	if err != nil {
 		printErrorAndExit("unable to parse minor version `" + Version + "`")
 	}
-	build, err := strconv.Atoi(submatches[0][1])
+	build, err := strconv.Atoi(submatches[0][3])
 	if err != nil {
 		printErrorAndExit("unable to parse build version `" + Version + "`")
 	}
