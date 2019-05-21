@@ -3,19 +3,19 @@
     homepage: https://github.com/wrmilling
     name: Winston R. Milling
   binaries:
-  - checksum: c37a8200e9243e8a93caf4a6c9573bb3afed7e6b
+  - checksum: b1faab56c0ba8e15299f4b4a62e354db6a64a872
     platform: osx
     url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.2/cf-rolling-restart-darwin-amd64
-  - checksum: aed983cb0248b578c30edeaa894e02de25bfb7b1
+  - checksum: 3f16559d69c8021d3e58dd21ee70e53bfa53cdeb
     platform: win32
     url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.2/cf-rolling-restart-windows-386.exe
-  - checksum: 1970b575bf71fc8abbe42106d5b3b323a521f5e7
+  - checksum: 180c6a3d736f34cfd429ab520a060cf22cf73012
     platform: win64
     url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.2/cf-rolling-restart-windows-amd64.exe
-  - checksum: 17dd9f15ac6b309385eb5516c4f94f1a120beecf
+  - checksum: fe304504184f0c3b55b7443b1fe03a3ddacc7cdd
     platform: linux32
     url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.2/cf-rolling-restart-windows-amd64.exe
-  - checksum: b3a1703a75a48e734c66255a6d7c6d4696aa0faa
+  - checksum: 9e71d247187859882e76d941f2407e684210cf85
     platform: linux64
     url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.2/cf-rolling-restart-linux-amd64
   company: The Home Depot
@@ -23,5 +23,5 @@
   description: cf-rolling-restart performs a zero-downtime restart of PCF application instances
   homepage: https://github.com/homedepot/cf-rolling-restart
   name: cf-rolling-restart
-  updated: 2019-05-09T14:47:26Z
+  updated: 2019-05-21T13:40:03Z
   version: 1.0.2
