@@ -89,7 +89,6 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 	var appGUID string
 	var instances Instances
 	var instanceIDs []string
-	var isRunning bool
 	var restarted bool
 	var err error
 
@@ -115,8 +114,21 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 	}
 
 	if instanceIDs = getKeysFor(instances); len(instanceIDs) < 2 {
-		printError("There are too few instances to ensure zero-downtime, use `cf restart APP_NAME` if you are OK with downtime.")
-		return failureExit
+		printFormatted("Only found a single instance of %s, scaling up to two instances.\n", appName)
+
+		if err = scaleApplication(conn, appName, 2); err != nil {
+			printFormatted("Failed to scale %s to two instances.\n", appName)
+			printError(err.Error())
+			return failureExit
+		}
+
+		if restarted, err = checkInstanceStatus(conn, appGUID, "1"); err != nil {
+			printFormatted("Failed to get the instance information for %s.\n", appName)
+			printError(err.Error())
+			return failureExit
+		}
+
+		printFormatted("Finished scaling %s to two instances.\n", appName)
 	}
 
 	printFormatted("Beginning restart of app instances for %s.\n", appName)
@@ -128,24 +140,10 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 			return failureExit
 		}
 
-		printFormatted("Checking status of instance %s.\n", instanceID)
-
-		for i := 0; i < maxRestartWaitCycles; i++ {
-			spinner.Next()
-
-			if isRunning, err = isInstanceRunning(conn, appGUID, instanceID); err != nil {
-				printFormatted("Failed to get the instance information for %s.\n", appName)
-				printError(err.Error())
-				return failureExit
-			}
-
-			if isRunning {
-				spinner.Done()
-				restarted = true
-				break
-			}
-
-			time.Sleep(time.Second)
+		if restarted, err = checkInstanceStatus(conn, appGUID, instanceID); err != nil {
+			printFormatted("Failed to get the instance information for %s.\n", appName)
+			printError(err.Error())
+			return failureExit
 		}
 
 		if restarted == false {
@@ -154,9 +152,44 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 		}
 	}
 
-	printFormatted("Finished restart of app instances for %s.", appName)
+	if len(instanceIDs) == 1 {
+		printFormatted("Scaling %s back down to one instance.\n", appName)
+		scaleApplication(conn, appName, 1)
+	}
+
+	printFormatted("Finished restart of app instances for %s.\n", appName)
 
 	return successfulExit
+}
+
+func scaleApplication(conn plugin.CliConnection, appName string, numberOfInstances int) (error) {
+	_, err := conn.CliCommand("scale", appName, "-i", strconv.Itoa(numberOfInstances))
+	return err
+}
+
+func checkInstanceStatus(conn plugin.CliConnection, appGUID string, instanceID string) (bool, error) {
+	printFormatted("Checking status of instance %s.\n", instanceID)
+
+	var isRunning bool
+	var restarted bool
+	var err error
+
+	for i := 0; i < maxRestartWaitCycles; i++ {
+		spinner.Next()
+
+		if isRunning, err = isInstanceRunning(conn, appGUID, instanceID); err != nil {
+			return false, err
+		}
+
+		if isRunning {
+			spinner.Done()
+			restarted = true
+			break
+		}
+
+		time.Sleep(time.Second)
+	}
+	return restarted, nil
 }
 
 func printError(message string) {

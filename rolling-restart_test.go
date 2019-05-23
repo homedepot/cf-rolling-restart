@@ -32,7 +32,7 @@ type testError struct {
 }
 
 func (e *testError) Error() string {
-	return ""
+	return e.prob
 }
 
 func TestMain(m *testing.M) {
@@ -98,7 +98,7 @@ func TestRollingRestart_Run_Success(t *testing.T) {
 	require.Equal(t, "Beginning restart of app instances for testApp.\n", output[0])
 	require.Equal(t, "Checking status of instance 0.\n", output[1])
 	require.Equal(t, "Checking status of instance 1.\n", output[2])
-	require.Equal(t, "Finished restart of app instances for testApp.", output[3])
+	require.Equal(t, "Finished restart of app instances for testApp.\n", output[3])
 	require.Contains(t, spinnerBuffer.String(), "OK")
 
 	require.Equal(t, exitCode, 0)
@@ -123,14 +123,16 @@ func TestRollingRestart_Run_Success_SingleAppInstance(t *testing.T) {
 	require.Equal(t, []string{"app", "testApp", "--guid"}, cliConn.CliCommandWithoutTerminalOutputArgsForCall(0))
 	require.Equal(t, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}, cliConn.CliCommandWithoutTerminalOutputArgsForCall(1))
 	require.Equal(t, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}, cliConn.CliCommandWithoutTerminalOutputArgsForCall(2))
+	require.Equal(t, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}, cliConn.CliCommandWithoutTerminalOutputArgsForCall(2))
 
-	require.Equal(t, 6, len(output))
-	require.Equal(t, "Scaling testApp to two instances.", output[0])
-	require.Equal(t, "Beginning restart of app instances for testApp.\n", output[1])
-	require.Equal(t, "Checking status of instance 0.\n", output[2])
-	require.Equal(t, "Checking status of instance 1.\n", output[3])
-	require.Equal(t, "Finished restart of app instances for testApp.", output[4])
-	require.Equal(t, "Scaling testApp to one instance.", output[5])
+	require.Equal(t, 7, len(output))
+	require.Equal(t, "Only found a single instance of testApp, scaling up to two instances.\n", output[0])
+	require.Equal(t, "Checking status of instance 1.\n", output[1])
+	require.Equal(t, "Finished scaling testApp to two instances.\n", output[2])
+	require.Equal(t, "Beginning restart of app instances for testApp.\n", output[3])
+	require.Equal(t, "Checking status of instance 0.\n", output[4])
+	require.Equal(t, "Scaling testApp back down to one instance.\n", output[5])
+	require.Equal(t, "Finished restart of app instances for testApp.\n", output[6])
 
 	require.Contains(t, spinnerBuffer.String(), "OK")
 
@@ -225,44 +227,57 @@ func TestRollingRestart_Run_GetGuidThrowsError(t *testing.T) {
 	resetOutput()
 	setupIsLoggedInStub(true, false)
 	setupHasOrganizationStub(true, false)
-	setupHasSpaceStub(false, true)
+	setupHasSpaceStub(true, false)
 	setupCliCommandWihtoutTerminalOutputStub(false, true, twoInstanceResponse)
 	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
 
 	require.Equal(t, exitCode, 1)
-	require.Contains(t, output[0], "CLI FAILURE")
+	require.Contains(t, output[0], "CliCommandWithoutTerminalStubError")
 }
 
 func TestRollingRestart_Run_GetInstancesThrowsError(t *testing.T) {
 	resetOutput()
 	setupIsLoggedInStub(true, false)
 	setupHasOrganizationStub(true, false)
-	setupHasSpaceStub(false, true)
+	setupHasSpaceStub(true, false)
 	setupCliCommandWihtoutTerminalOutputStub(true, false, twoInstanceResponse)
 	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
 
 	require.Equal(t, exitCode, 1)
-	require.Contains(t, output[0], "CLI FAILURE")
+	require.Contains(t, output[0], "Failed to get the instance information for testApp.\n")
+}
+
+func TestRollingRestart_Run_ScaleAppThrowsError(t *testing.T) {
+	resetOutput()
+	setupIsLoggedInStub(true, false)
+	setupHasOrganizationStub(true, false)
+	setupHasSpaceStub(true, false)
+	setupCliCommandWihtoutTerminalOutputStub(true, true, singleInstanceResponse)
+	setupCliCommandStub(true, false)
+	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
+
+	require.Equal(t, exitCode, 1)
+	require.Contains(t, output[1], "Failed to scale testApp to two instances.")
 }
 
 func TestRollingRestart_Run_RestartInstanceThrowsError(t *testing.T) {
 	resetOutput()
 	setupIsLoggedInStub(true, false)
 	setupHasOrganizationStub(true, false)
-	setupHasSpaceStub(false, true)
+	setupHasSpaceStub(true, false)
 	setupCliCommandWihtoutTerminalOutputStub(true, true, twoInstanceResponse)
 	setupCliCommandStub(false, true)
 	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
 
 	require.Equal(t, exitCode, 1)
-	require.Contains(t, output[0], "CLI FAILURE")
+	require.Contains(t, output[1], "Failed to restart instance 0.\n")
 }
 
 func TestRollingRestart_Run_InstanceJsonUnmarshallError(t *testing.T) {
 	resetOutput()
 	setupIsLoggedInStub(true, false)
 	setupHasOrganizationStub(true, false)
-	setupHasSpaceStub(false, true)
+	setupHasSpaceStub(true, true)
 	setupCliCommandWihtoutTerminalOutputStub(true, true, badInstanceResponse)
 	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
 
@@ -300,19 +315,6 @@ func TestRollingRestart_Run_InstanceDoesNotRestartCustomCycleLimit(t *testing.T)
 	require.Contains(t, output[2], "Application did not restart within 2 Second(s), failing out. Check your current application state.")
 }
 
-func TestRollingRestart_Run_SingleInstanceThrowError(t *testing.T) {
-	resetOutput()
-	setupIsLoggedInStub(true, false)
-	setupHasOrganizationStub(true, false)
-	setupHasSpaceStub(true, false)
-	setupCliCommandWihtoutTerminalOutputStub(true, true, singleInstanceResponse)
-	setupCliCommandStub(true, true)
-	rr.Run(cliConn, []string{"rolling-restart", "testApp"})
-
-	require.Equal(t, exitCode, 1)
-	require.Contains(t, output[0], "There are too few instances to ensure zero-downtime, use `cf restart APP_NAME` if you are OK with downtime.")
-}
-
 func setupHasSpaceStub(hasSpace bool, throwError bool) {
 	cliConn.HasSpaceStub = func() (bool, error) {
 		if throwError {
@@ -347,7 +349,7 @@ func setupCliCommandWihtoutTerminalOutputStub(getGUIDSuccess bool, getInstanceSt
 		} else if reflect.DeepEqual(args, []string{"curl", "-X", "GET", "/v2/apps/valid-app-guid/instances"}) && getInstanceStatusSuccess {
 			return instanceResponse, nil
 		}
-		return nil, &testError{}
+		return nil, &testError{1, "CliCommandWithoutTerminalStubError"}
 	}
 }
 
@@ -358,7 +360,7 @@ func setupCliCommandStub(restartSuccess bool, scaleSuccess bool) {
 		} else if args[0] == "scale" && args[1] == "testApp" && args[2] == "-i" && args[3] == "2" && scaleSuccess{
 			return nil, nil
 		}
-		return nil, &testError{}
+		return nil, &testError{1, "CliCommandStubError"}
 	}
 }
 
@@ -382,4 +384,5 @@ func exitStub(code int) {
 
 func resetOutput() {
 	output = []string{}
+	cliConn = &pluginfakes.FakeCliConnection{}
 }
