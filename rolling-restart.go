@@ -162,7 +162,7 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 	return successfulExit
 }
 
-func scaleApplication(conn plugin.CliConnection, appName string, numberOfInstances int) (error) {
+func scaleApplication(conn plugin.CliConnection, appName string, numberOfInstances int) error {
 	_, err := conn.CliCommand("scale", appName, "-i", strconv.Itoa(numberOfInstances))
 	return err
 }

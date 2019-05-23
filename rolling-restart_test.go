@@ -357,7 +357,7 @@ func setupCliCommandStub(restartSuccess bool, scaleSuccess bool) {
 	cliConn.CliCommandStub = func(args ...string) ([]string, error) {
 		if args[0] == "restart-app-instance" && args[1] == "testApp" && (args[2] == "0" || args[2] == "1") && restartSuccess {
 			return nil, nil
-		} else if args[0] == "scale" && args[1] == "testApp" && args[2] == "-i" && args[3] == "2" && scaleSuccess{
+		} else if args[0] == "scale" && args[1] == "testApp" && args[2] == "-i" && args[3] == "2" && scaleSuccess {
 			return nil, nil
 		}
 		return nil, &testError{1, "CliCommandStubError"}
