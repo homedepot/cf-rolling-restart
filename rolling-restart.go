@@ -122,7 +122,7 @@ func execute(conn plugin.CliConnection, args []string) (exitCode int) {
 			return failureExit
 		}
 
-		if restarted, err = checkInstanceStatus(conn, appGUID, "1"); err != nil {
+		if _, err = checkInstanceStatus(conn, appGUID, "1"); err != nil {
 			printFormatted("Failed to get the instance information for %s.\n", appName)
 			printError(err.Error())
 			return failureExit
