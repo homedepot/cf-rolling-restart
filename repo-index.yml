@@ -3,25 +3,25 @@
     homepage: https://github.com/wrmilling
     name: Winston R. Milling
   binaries:
-  - checksum: 04f970a2e3a7c11af6e523361a8083259da0196f
+  - checksum: 75c7cfc80ea7ad08fd8646718ff09b16a41c963b
     platform: osx
-    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.3/cf-rolling-restart-darwin-amd64
-  - checksum: 576029b7d1705de9904ff94c12dc3a863f263cc3
+    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.1.0/cf-rolling-restart-darwin-amd64
+  - checksum: 843a2b11e30f0dbfac202d66bbc83a006f72676a
     platform: win32
-    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.3/cf-rolling-restart-windows-386.exe
-  - checksum: 7b90cc32c2b2be190e054d97f28d2b04c110451e
+    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.1.0/cf-rolling-restart-windows-386.exe
+  - checksum: a587c5248f238f48651933fc91c992a5d48fb9a1
     platform: win64
-    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.3/cf-rolling-restart-windows-amd64.exe
-  - checksum: 868887ace9652011a9f0308773da865d70b30512
+    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.1.0/cf-rolling-restart-windows-amd64.exe
+  - checksum: 7b359805b582da23bda9d104985c0517d52d3283
     platform: linux32
-    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.3/cf-rolling-restart-windows-amd64.exe
-  - checksum: 40aef702ae800202414168bf8cc9c8dfcad10b3a
+    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.1.0/cf-rolling-restart-windows-amd64.exe
+  - checksum: 303292ae457e2ef71deeb1e898240832b5503283
     platform: linux64
-    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.0.3/cf-rolling-restart-linux-amd64
+    url: https://github.com/homedepot/cf-rolling-restart/releases/download/v1.1.0/cf-rolling-restart-linux-amd64
   company: The Home Depot
   created: 2017-12-26T00:00:00Z
   description: cf-rolling-restart performs a zero-downtime restart of PCF application instances
   homepage: https://github.com/homedepot/cf-rolling-restart
   name: cf-rolling-restart
-  updated: 2019-05-21T13:52:14Z
-  version: 1.0.3
+  updated: 2019-05-23T15:24:10Z
+  version: 1.1.0
