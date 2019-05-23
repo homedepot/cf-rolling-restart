@@ -19,7 +19,7 @@ import (
 
 // Basic variables for cf-rolling-restart.
 var (
-	Version    = "1.0.2"
+	Version    = "1.1.1"
 	GitCommit  = "HEAD"
 	BuildStamp = "UNKNOWN"
 
@@ -52,7 +52,7 @@ type RollingRestart struct {
 // GetMetadata returns the pertinent metadata for the CF CLI Plugin architecture.
 func (c *RollingRestart) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name:    "RollingRestartPlugin",
+		Name:    "cf-rolling-restart",
 		Version: c.Version,
 		MinCliVersion: plugin.VersionType{
 			Major: 6,
