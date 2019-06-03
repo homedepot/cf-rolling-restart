@@ -13,7 +13,13 @@ This was made to fill a the gap in zero-downtime restarts for the PCF CLI. It wi
 
 ## Installation
 
-Download the latest version from the releases page and make it executable.
+You can install the latest release from [CF Community Plugins](https://plugins.cloudfoundry.org) by running the following command:
+
+```
+cf install-plugin -r CF-Community "cf-rolling-restart"
+```
+
+Alternatively, you can download any previous releases from the GitHub releases page and install using the built in `install-plugin` command of the cf-cli. 
 
 ```
 $ cf install-plugin path/to/downloaded/binary
